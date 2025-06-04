@@ -1,0 +1,91 @@
+PMX (Partially Mapped Crossover) procedure with the given parent permutations and crossover positions.
+-----------------------------------------------------------------------------------------------------
+
+
+exista doua interpretari:
+          1-index based
+          0-index based
+          
+pozitiile 1-index
+
+     1  2  3  4  5  6  7  8  9  10
+X = [1, 4, 5, 8, 7, 9, 2, 3, 6, 10]
+
+Y = [9, 3, 4, 2, 8, 7, 10, 5, 1, 6]
+
+Pozițiile de crossover: (5, 6)
+
+Pasul 1: Identificarea segmentului de crossover
+
+Segmentul de crossover se află între pozițiile 5 și 6:
+
+          Din X: pozițiile 5-6 sunt [7, 9]
+          
+          Din Y: pozițiile 5-6 sunt [8, 7]
+
+Pasul 2: Copierea segmentelor de crossover          
+
+Cream descendentii copiind segmentele de crossover:
+
+C1 primește segmentul din Y: [_, _, _, _, 8, 7, _, _, _, _]
+C2 primește segmentul din X: [_, _, _, _, 7, 9, _, _, _, _]
+
+Dar observăm că 7 apare în ambele segmente, deci maparea finală este:
+
+       9 ↔ 8
+       
+Pasul 4: Completarea celorlalte poziții
+
+C1:
+Incercăm să copiem din X, dar evităm duplicatele folosind maparea:
+
+Poziția 1: X[1] = 1 → nu e în conflict → C1[1] = 1
+
+Poziția 2: X[2] = 4 → nu e în conflict → C1[2] = 4
+
+Poziția 3: X[3] = 5 → nu e în conflict → C1[3] = 5
+
+Poziția 4: X[4] = 8 → 8 e deja în C1, mapăm la 9 → C1[4] = 9
+
+Pozițiile 5-6: deja completate cu [8, 7]
+
+Poziția 7: X[7] = 2 → nu e în conflict → C1[7] = 2
+
+Poziția 8: X[8] = 3 → nu e în conflict → C1[8] = 3
+
+Poziția 9: X[9] = 6 → nu e în conflict → C1[9] = 6
+
+Poziția 10: X[10] = 10 → nu e în conflict → C1[10] = 10
+
+Rezultat C1 = [1, 4, 5, 9, 8, 7, 2, 3, 6, 10]
+
+
+Acum cautam pe c2:
+
+
+Incercam sa copiem din Y, dar evitam duplicatele folosind maparea inversa:
+
+Pozitia 1: Y[1] = 9 → 9 e deja în C2, mapăm la 8 → C2[1] = 8
+
+Pozitia 2: Y[2] = 3 → nu e în conflict → C2[2] = 3
+
+Poziția 3: Y[3] = 4 → nu e în conflict → C2[3] = 4
+
+Poziția 4: Y[4] = 2 → nu e în conflict → C2[4] = 2
+
+Pozitiile 5-6: deja completate cu [7, 9]
+
+Poziția 7: Y[7] = 10 → nu e în conflict → C2[7] = 10
+
+Poziția 8: Y[8] = 5 → nu e în conflict → C2[8] = 5
+
+Poziția 9: Y[9] = 1 → nu e în conflict → C2[9] = 1
+
+Poziția 10: Y[10] = 6 → nu e în conflict → C2[10] = 6
+
+Rezultat C2 = [8, 3, 4, 2, 7, 9, 10, 5, 1, 6]
+
+Rezultatul Final:
+
+C1 = [1, 4, 5, 9, 8, 7, 2, 3, 6, 10]
+C2 = [8, 3, 4, 2, 7, 9, 10, 5, 1, 6]
