@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Target String GA</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    .gene { font-size: 24px; font-family: monospace; }
+  </style>
+</head>
+<body>
+
+<h1>Target String Genetic Algorithm</h1>
+<p>Target: <strong id="target"></strong></p>
+<p>Generation: <span id="generation">0</span></p>
+<p>Best Match: <span class="gene" id="best"></span></p>
+<p>Fitness: <span id="fitness">0</span></p>
+
+<script>
+  const target = "Hello, world!";
+  const populationSize = 200;
+  const mutationRate = 0.01;
+  const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz,.!? ";
+  const geneLength = target.length;
+
+  document.getElementById("target").textContent = target;
+
+  function randomChar() {
+    return charset.charAt(Math.floor(Math.random() * charset.length));
+  }
+
+  function randomGene() {
+    return Array.from({ length: geneLength }, randomChar).join('');
+  }
+
+  function fitness(gene) {
+    let score = 0;
+    for (let i = 0; i < gene.length; i++) {
+      if (gene[i] === target[i]) score++;
+    }
+    return score / geneLength;
+  }
+
+  function crossover(parentA, parentB) {
+    const midpoint = Math.floor(Math.random() * geneLength);
+    let child = "";
+    for (let i = 0; i < geneLength; i++) {
+      child += (i < midpoint ? parentA[i] : parentB[i]);
+    }
+    return mutate(child);
+  }
+
+  function mutate(gene) {
+    return gene.split('').map(ch => Math.random() < mutationRate ? randomChar() : ch).join('');
+  }
+
+  let generation = 0;
+  let population = Array.from({ length: populationSize }, randomGene);
+
+  function evolve() {
+    generation++;
+    const sorted = population
+      .map(g => ({ gene: g, fit: fitness(g) }))
+      .sort((a, b) => b.fit - a.fit);
+
+    const best = sorted[0];
+    document.getElementById("generation").textContent = generation;
+    document.getElementById("best").textContent = best.gene;
+    document.getElementById("fitness").textContent = (best.fit * 100).toFixed(2) + "%";
+
+    if (best.gene === target) {
+      clearInterval(interval);
+      alert("Target reached in " + generation + " generations!");
+      return;
+    }
+
+    // Select top 20% as parents
+    const parents = sorted.slice(0, populationSize * 0.2).map(p => p.gene);
+
+    // Reproduce
+    population = Array.from({ length: populationSize }, () => {
+      const a = parents[Math.floor(Math.random() * parents.length)];
+      const b = parents[Math.floor(Math.random() * parents.length)];
+      return crossover(a, b);
+    });
+  }
+
+  const interval = setInterval(evolve, 50); // evolve every 50 ms
+</script>
+
+</body>
+</html>
