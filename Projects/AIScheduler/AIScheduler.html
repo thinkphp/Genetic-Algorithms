@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Scheduler - Planificare Automată cu Algoritmi Genetici</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border-left: 5px solid #4facfe;
+        }
+
+        .section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .employee-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 5px;
+        }
+
+        input, select {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(79, 172, 254, 0.3);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(56, 239, 125, 0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+            color: white;
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+
+        .employee-list {
+            display: grid;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .employee-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .employee-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .employee-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .constraints-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .schedule-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .schedule-table th {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .schedule-table td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+            transition: all 0.3s ease;
+        }
+
+        .schedule-table tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .working {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%) !important;
+            color: white;
+            font-weight: bold;
+        }
+
+        .free {
+            background: #f8f9fa;
+            color: #666;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #4facfe;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4facfe, #00f2fe);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .algorithm-status {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .employee-form {
+                grid-template-columns: 1fr;
+            }
+            
+            .constraints-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .schedule-table {
+                font-size: 14px;
+            }
+            
+            .schedule-table th,
+            .schedule-table td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧬 AI Scheduler</h1>
+            <p>Planificare automată a turelor folosind algoritmi genetici</p>
+        </div>
+
+        <div class="main-content">
+            <!-- Secțiunea Angajați -->
+            <div class="section">
+                <h2>👥 Adaugă Angajați</h2>
+                <div class="employee-form">
+                    <div class="input-group">
+                        <label for="employeeName">Nume Angajat</label>
+                        <input type="text" id="employeeName" placeholder="Ex: Ana Maria">
+                    </div>
+                    <div class="input-group">
+                        <label for="unavailableDay">Zi Indisponibilă (opțional)</label>
+                        <select id="unavailableDay">
+                            <option value="">Nicio restricție</option>
+                            <option value="0">Luni</option>
+                            <option value="1">Marți</option>
+                            <option value="2">Miercuri</option>
+                            <option value="3">Joi</option>
+                            <option value="4">Vineri</option>
+                            <option value="5">Sâmbătă</option>
+                            <option value="6">Duminică</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" onclick="addEmployee()">Adaugă</button>
+                </div>
+                
+                <div class="employee-list" id="employeeList"></div>
+            </div>
+
+            <!-- Secțiunea Constrângeri -->
+            <div class="section">
+                <h2>⚙️ Configurează Constrângerile</h2>
+                <div class="constraints-grid">
+                    <div class="input-group">
+                        <label for="minEmployeesPerDay">Angajați minim pe zi</label>
+                        <input type="number" id="minEmployeesPerDay" value="2" min="1">
+                    </div>
+                    <div class="input-group">
+                        <label for="maxWorkDays">Zile maxime de muncă</label>
+                        <input type="number" id="maxWorkDays" value="5" min="1" max="7">
+                    </div>
+                    <div class="input-group">
+                        <label for="populationSize">Mărimea populației</label>
+                        <input type="number" id="populationSize" value="50" min="10">
+                    </div>
+                    <div class="input-group">
+                        <label for="generations">Numărul generațiilor</label>
+                        <input type="number" id="generations" value="100" min="10">
+                    </div>
+                </div>
+                
+                <button class="btn btn-success" onclick="runGeneticAlgorithm()" style="margin-top: 20px;">
+                    🚀 Optimizează Programul
+                </button>
+            </div>
+
+            <!-- Status Algoritm -->
+            <div id="algorithmStatus" class="algorithm-status hidden">
+                <div>Rularea algoritmului genetic...</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div id="statusText">Generația 0/100</div>
+            </div>
+
+            <!-- Rezultate -->
+            <div id="resultsSection" class="section hidden">
+                <h2>📊 Program Optimizat</h2>
+                <div class="stats" id="stats"></div>
+                <table class="schedule-table" id="scheduleTable"></table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Date globale
+        let employees = [];
+        let bestSchedule = null;
+        let constraints = {};
+
+        // Zilele săptămânii
+        const days = ['Luni', 'Marți', 'Miercuri', 'Joi', 'Vineri', 'Sâmbătă', 'Duminică'];
+
+        // Adaugă angajat
+        function addEmployee() {
+            const nameInput = document.getElementById('employeeName');
+            const unavailableDaySelect = document.getElementById('unavailableDay');
+            
+            const name = nameInput.value.trim();
+            if (!name) {
+                alert('Te rog să introduci numele angajatului!');
+                return;
+            }
+            
+            const unavailableDay = unavailableDaySelect.value ? parseInt(unavailableDaySelect.value) : null;
+            
+            employees.push({
+                id: employees.length,
+                name: name,
+                unavailableDay: unavailableDay
+            });
+            
+            nameInput.value = '';
+            unavailableDaySelect.value = '';
+            updateEmployeeList();
+        }
+
+        // Actualizează lista angajaților
+        function updateEmployeeList() {
+            const list = document.getElementById('employeeList');
+            list.innerHTML = '';
+            
+            employees.forEach((employee, index) => {
+                const item = document.createElement('div');
+                item.className = 'employee-item';
+                
+                const unavailableText = employee.unavailableDay !== null ? 
+                    ` (Nu lucrează ${days[employee.unavailableDay]})` : '';
+                
+                item.innerHTML = `
+                    <div class="employee-info">
+                        <div class="employee-avatar">${employee.name.charAt(0).toUpperCase()}</div>
+                        <div>
+                            <strong>${employee.name}</strong>
+                            <span style="color: #666;">${unavailableText}</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-danger" onclick="removeEmployee(${index})">Șterge</button>
+                `;
+                
+                list.appendChild(item);
+            });
+        }
+
+        // Șterge angajat
+        function removeEmployee(index) {
+            employees.splice(index, 1);
+            // Resetează ID-urile
+            employees.forEach((emp, i) => emp.id = i);
+            updateEmployeeList();
+        }
+
+        // Clasă pentru individ (cromozom)
+        class Individual {
+            constructor(numEmployees) {
+                this.schedule = [];
+                this.fitness = 0;
+                
+                // Inițializează programul aleatoriu (7 zile x numEmployees)
+                for (let day = 0; day < 7; day++) {
+                    this.schedule[day] = [];
+                    for (let emp = 0; emp < numEmployees; emp++) {
+                        // 60% șansă să lucreze în fiecare zi
+                        this.schedule[day][emp] = Math.random() < 0.6 ? 1 : 0;
+                    }
+                }
+            }
+
+            // Calculează fitness-ul
+            calculateFitness(constraints, employees) {
+                let fitness = 1000; // Start cu scor maxim
+                
+                // Penalizare pentru încălcarea constrângerilor
+                for (let day = 0; day < 7; day++) {
+                    let workingToday = this.schedule[day].reduce((sum, work) => sum + work, 0);
+                    
+                    // Prea puțini angajați într-o zi
+                    if (workingToday < constraints.minEmployeesPerDay) {
+                        fitness -= (constraints.minEmployeesPerDay - workingToday) * 50;
+                    }
+                }
+                
+                // Verifică constrângerile pentru fiecare angajat
+                for (let emp = 0; emp < employees.length; emp++) {
+                    let workDays = 0;
+                    
+                    for (let day = 0; day < 7; day++) {
+                        if (this.schedule[day][emp] === 1) {
+                            workDays++;
+                            
+                            // Penalizare dacă lucrează în ziua indisponibilă
+                            if (employees[emp].unavailableDay === day) {
+                                fitness -= 100;
+                            }
+                        }
+                    }
+                    
+                    // Penalizare dacă lucrează prea mult sau prea puțin
+                    if (workDays > constraints.maxWorkDays) {
+                        fitness -= (workDays - constraints.maxWorkDays) * 30;
+                    } else if (workDays < 3) { // Minim 3 zile pe săptămână
+                        fitness -= (3 - workDays) * 20;
+                    }
+                }
+                
+                this.fitness = Math.max(0, fitness);
+                return this.fitness;
+            }
+
+            // Crossover cu alt individ
+            crossover(other) {
+                const child = new Individual(employees.length);
+                
+                // Crossover pe rânduri (angajați)
+                for (let emp = 0; emp < employees.length; emp++) {
+                    const useParent1 = Math.random() < 0.5;
+                    for (let day = 0; day < 7; day++) {
+                        child.schedule[day][emp] = useParent1 ? 
+                            this.schedule[day][emp] : other.schedule[day][emp];
+                    }
+                }
+                
+                return child;
+            }
+
+            // Mutație
+            mutate(mutationRate = 0.1) {
+                for (let day = 0; day < 7; day++) {
+                    for (let emp = 0; emp < employees.length; emp++) {
+                        if (Math.random() < mutationRate) {
+                            this.schedule[day][emp] = 1 - this.schedule[day][emp];
+                        }
+                    }
+                }
+            }
+        }
+
+        // Clasă pentru populație
+        class Population {
+            constructor(size, numEmployees) {
+                this.individuals = [];
+                this.size = size;
+                
+                for (let i = 0; i < size; i++) {
+                    this.individuals.push(new Individual(numEmployees));
+                }
+            }
+
+            // Evaluează toată populația
+            evaluate(constraints, employees) {
+                this.individuals.forEach(individual => {
+                    individual.calculateFitness(constraints, employees);
+                });
+                
+                // Sortează după fitness
+                this.individuals.sort((a, b) => b.fitness - a.fitness);
+            }
+
+            // Selecție tournament
+            tournamentSelection() {
+                const tournamentSize = 3;
+                let best = null;
+                
+                for (let i = 0; i < tournamentSize; i++) {
+                    const candidate = this.individuals[Math.floor(Math.random() * this.individuals.length)];
+                    if (!best || candidate.fitness > best.fitness) {
+                        best = candidate;
+                    }
+                }
+                
+                return best;
+            }
+
+            // Evoluează o generație
+            evolve(constraints, employees) {
+                const newIndividuals = [];
+                
+                // Păstrează cei mai buni 10% (elitism)
+                const eliteCount = Math.floor(this.size * 0.1);
+                for (let i = 0; i < eliteCount; i++) {
+                    newIndividuals.push(this.individuals[i]);
+                }
+                
+                // Generează restul prin crossover și mutație
+                while (newIndividuals.length < this.size) {
+                    const parent1 = this.tournamentSelection();
+                    const parent2 = this.tournamentSelection();
+                    
+                    const child = parent1.crossover(parent2);
+                    child.mutate(0.15);
+                    
+                    newIndividuals.push(child);
+                }
+                
+                this.individuals = newIndividuals;
+                this.evaluate(constraints, employees);
+            }
+
+            getBest() {
+                return this.individuals[0];
+            }
+        }
+
+        // Rulează algoritmul genetic
+        async function runGeneticAlgorithm() {
+            if (employees.length < 2) {
+                alert('Adaugă cel puțin 2 angajați pentru a putea optimiza programul!');
+                return;
+            }
+
+            // Colectează constrângerile
+            constraints = {
+                minEmployeesPerDay: parseInt(document.getElementById('minEmployeesPerDay').value),
+                maxWorkDays: parseInt(document.getElementById('maxWorkDays').value)
+            };
+
+            const populationSize = parseInt(document.getElementById('populationSize').value);
+            const maxGenerations = parseInt(document.getElementById('generations').value);
+
+            // Afișează status
+            const statusDiv = document.getElementById('algorithmStatus');
+            const progressFill = document.getElementById('progressFill');
+            const statusText = document.getElementById('statusText');
+            statusDiv.classList.remove('hidden');
+
+            // Inițializează populația
+            const population = new Population(populationSize, employees.length);
+            population.evaluate(constraints, employees);
+
+            // Evoluția
+            for (let generation = 0; generation < maxGenerations; generation++) {
+                population.evolve(constraints, employees);
+                
+                // Actualizează progress
+                const progress = ((generation + 1) / maxGenerations) * 100;
+                progressFill.style.width = progress + '%';
+                statusText.textContent = `Generația ${generation + 1}/${maxGenerations} - Fitness: ${population.getBest().fitness.toFixed(0)}`;
+                
+                // Pauză pentru a permite actualizarea UI
+                await new Promise(resolve => setTimeout(resolve, 50));
+            }
+
+            bestSchedule = population.getBest();
+            
+            // Ascunde status și afișează rezultatele
+            statusDiv.classList.add('hidden');
+            displayResults();
+        }
+
+        // Afișează rezultatele
+        function displayResults() {
+            const resultsSection = document.getElementById('resultsSection');
+            resultsSection.classList.remove('hidden');
+
+            // Calculează statistici
+            const stats = calculateStats();
+            displayStats(stats);
+            displayScheduleTable();
+        }
+
+        // Calculează statistici
+        function calculateStats() {
+            let totalWorkDays = 0;
+            let minWorkersPerDay = Infinity;
+            let maxWorkersPerDay = 0;
+
+            for (let day = 0; day < 7; day++) {
+                let workersToday = bestSchedule.schedule[day].reduce((sum, work) => sum + work, 0);
+                minWorkersPerDay = Math.min(minWorkersPerDay, workersToday);
+                maxWorkersPerDay = Math.max(maxWorkersPerDay, workersToday);
+            }
+
+            employees.forEach((_, emp) => {
+                for (let day = 0; day < 7; day++) {
+                    if (bestSchedule.schedule[day][emp] === 1) {
+                        totalWorkDays++;
+                    }
+                }
+            });
+
+            return {
+                fitness: bestSchedule.fitness,
+                totalWorkDays: totalWorkDays,
+                avgWorkDaysPerEmployee: (totalWorkDays / employees.length).toFixed(1),
+                minWorkersPerDay: minWorkersPerDay,
+                maxWorkersPerDay: maxWorkersPerDay
+            };
+        }
+
+        // Afișează statisticile
+        function displayStats(stats) {
+            const statsDiv = document.getElementById('stats');
+            statsDiv.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-value">${stats.fitness}</div>
+                    <div class="stat-label">Scor Fitness</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${stats.avgWorkDaysPerEmployee}</div>
+                    <div class="stat-label">Zile/Angajat (medie)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${stats.minWorkersPerDay}</div>
+                    <div class="stat-label">Min Angajați/Zi</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${stats.maxWorkersPerDay}</div>
+                    <div class="stat-label">Max Angajați/Zi</div>
+                </div>
+            `;
+        }
+
+        // Afișează tabelul cu programul
+        function displayScheduleTable() {
+            const table = document.getElementById('scheduleTable');
+            
+            // Header
+            let html = '<thead><tr><th>Angajat</th>';
+            days.forEach(day => {
+                html += `<th>${day}</th>`;
+            });
+            html += '<th>Total Zile</th></tr></thead><tbody>';
+
+            // Rânduri pentru fiecare angajat
+            employees.forEach((employee, empIndex) => {
+                html += `<tr><td><strong>${employee.name}</strong></td>`;
+                let totalDays = 0;
+                
+                for (let day = 0; day < 7; day++) {
+                    const isWorking = bestSchedule.schedule[day][empIndex] === 1;
+                    const cellClass = isWorking ? 'working' : 'free';
+                    const cellText = isWorking ? '✓' : '—';
+                    
+                    if (isWorking) totalDays++;
+                    
+                    html += `<td class="${cellClass}">${cellText}</td>`;
+                }
+                
+                html += `<td><strong>${totalDays}</strong></td></tr>`;
+            });
+
+            // Rând pentru totaluri pe zile
+            html += '<tr style="background: #f0f0f0; font-weight: bold;"><td>Total/Zi</td>';
+            for (let day = 0; day < 7; day++) {
+                const totalForDay = bestSchedule.schedule[day].reduce((sum, work) => sum + work, 0);
+                html += `<td>${totalForDay}</td>`;
+            }
+            html += '<td>—</td></tr>';
+
+            html += '</tbody>';
+            table.innerHTML = html;
+        }
+
+        // Adaugă câțiva angajați demo la începutul paginii
+        function initializeDemoData() {
+            const demoEmployees = [
+                { name: 'Ana Popescu', unavailableDay: null },
+                { name: 'Ion Marinescu', unavailableDay: 0 }, // Nu lucrează luni
+                { name: 'Maria Ionescu', unavailableDay: 4 }, // Nu lucrează vineri
+                { name: 'Gheorghe Vasile', unavailableDay: null },
+                { name: 'Elena Radu', unavailableDay: 6 } // Nu lucrează duminică
+            ];
+
+            employees = demoEmployees.map((emp, index) => ({
+                id: index,
+                name: emp.name,
+                unavailableDay: emp.unavailableDay
+            }));
+
+            updateEmployeeList();
+        }
+
+        // Inițializează datele demo când se încarcă pagina
+        window.onload = function() {
+            initializeDemoData();
+        };
+    </script>
+</body>
+</html>
